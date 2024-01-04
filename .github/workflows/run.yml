@@ -1,8 +1,14 @@
 name: 刷步数
 
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  watch:
+    types: started
   schedule:
-    - cron: '56 1,4,7,10,12,14,23 * * *'
+    - cron: 30 0 * * *
   workflow_dispatch:
 
 jobs:
