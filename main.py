@@ -3,13 +3,13 @@ import math
 import traceback
 from datetime import datetime
 import pytz
-import sys
 
 import json
 import random
 import re
 import time
 import os
+import sys
 
 import requests
 
@@ -342,8 +342,7 @@ def run_single_account(total, idx, user_mi, passwd_mi):
     return exec_result
 
 
-def execute(to_push):
-    to_push = to_push
+def execute():
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
@@ -370,7 +369,6 @@ def execute(to_push):
             if result['success'] is True:
                 success_count += 1
         summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
-        # summary = f"\n执行账号总数，"
         print(summary)
 
         to_push.push_msg += summary
@@ -391,7 +389,7 @@ def execute(to_push):
 
 if __name__ == "__main__":
     # 北京时间
-    pkey = sys.argv[1]
+    pkey = sys.argv[2]
     to_push = ToPush(pkey)
     to_push.push_msg = ''
     time_bj = get_beijing_time()
@@ -427,4 +425,4 @@ if __name__ == "__main__":
             print(f"多账号执行间隔：{sleep_seconds}")
             use_concurrent = False
         # endregion
-        execute(to_push)
+        execute()
