@@ -338,7 +338,7 @@ def run_single_account(total, idx, user_mi, passwd_mi):
 
 
 
-def execute(to_push):
+def execute():
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
@@ -364,7 +364,7 @@ def execute(to_push):
                 success_count += 1
         summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
         print(summary)
-              to_push.push_msg = ''
+
                to_push.push_msg += summary
         # push_to_push_plus(push_results, summary)
                 push = {
@@ -386,6 +386,7 @@ if __name__ == "__main__":
         pkey = sys.argv[2]
       print("pkey: " + pkey)
         to_push = ToPush(pkey)
+           to_push.push_msg = ''
     time_bj = get_beijing_time()
     if os.environ.__contains__("CONFIG") is False:
         print("未配置CONFIG变量，无法执行")
@@ -419,4 +420,4 @@ if __name__ == "__main__":
             print(f"多账号执行间隔：{sleep_seconds}")
             use_concurrent = False
         # endregion
-        execute(to_push)
+        execute()
