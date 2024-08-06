@@ -381,41 +381,42 @@ def execute():
 
 if __name__ == "__main__":
     # 北京时间
-    pkey = sys.argv[2]
+    print(sys.argv)
+    # pkey = sys.argv[2]
 
-    to_push = ToPush(pkey)
-    to_push.push_msg = ''
-    time_bj = get_beijing_time()
-    if os.environ.__contains__("CONFIG") is False:
-        print("未配置CONFIG变量，无法执行")
-        exit(1)
-    else:
-        # region 初始化参数
-        config = dict()
-        try:
-            config = dict(json.loads(os.environ.get("CONFIG")))
-        except:
-            print("CONFIG格式不正确，请检查Secret配置，请严格按照JSON格式：使用双引号包裹字段和值，逗号不能多也不能少")
-            traceback.print_exc()
-            exit(1)
-        PUSH_PLUS_TOKEN = config.get('PUSH_PLUS_TOKEN')
-        PUSH_PLUS_HOUR = config.get('PUSH_PLUS_HOUR')
-        PUSH_PLUS_MAX = get_int_value_default(config, 'PUSH_PLUS_MAX', 30)
-        sleep_seconds = config.get('SLEEP_GAP')
-        if sleep_seconds is None or sleep_seconds == '':
-            sleep_seconds = 5
-        sleep_seconds = float(sleep_seconds)
-        users = config.get('USER')
-        passwords = config.get('PWD')
-        if users is None or passwords is None:
-            print("未正确配置账号密码，无法执行")
-            exit(1)
-        min_step, max_step = get_min_max_by_time()
-        use_concurrent = config.get('USE_CONCURRENT')
-        if use_concurrent is not None and use_concurrent == 'True':
-            use_concurrent = True
-        else:
-            print(f"多账号执行间隔：{sleep_seconds}")
-            use_concurrent = False
-        # endregion
-        execute()
+    # to_push = ToPush(pkey)
+    # to_push.push_msg = ''
+    # time_bj = get_beijing_time()
+    # if os.environ.__contains__("CONFIG") is False:
+    #     print("未配置CONFIG变量，无法执行")
+    #     exit(1)
+    # else:
+    #     # region 初始化参数
+    #     config = dict()
+    #     try:
+    #         config = dict(json.loads(os.environ.get("CONFIG")))
+    #     except:
+    #         print("CONFIG格式不正确，请检查Secret配置，请严格按照JSON格式：使用双引号包裹字段和值，逗号不能多也不能少")
+    #         traceback.print_exc()
+    #         exit(1)
+    #     PUSH_PLUS_TOKEN = config.get('PUSH_PLUS_TOKEN')
+    #     PUSH_PLUS_HOUR = config.get('PUSH_PLUS_HOUR')
+    #     PUSH_PLUS_MAX = get_int_value_default(config, 'PUSH_PLUS_MAX', 30)
+    #     sleep_seconds = config.get('SLEEP_GAP')
+    #     if sleep_seconds is None or sleep_seconds == '':
+    #         sleep_seconds = 5
+    #     sleep_seconds = float(sleep_seconds)
+    #     users = config.get('USER')
+    #     passwords = config.get('PWD')
+    #     if users is None or passwords is None:
+    #         print("未正确配置账号密码，无法执行")
+    #         exit(1)
+    #     min_step, max_step = get_min_max_by_time()
+    #     use_concurrent = config.get('USE_CONCURRENT')
+    #     if use_concurrent is not None and use_concurrent == 'True':
+    #         use_concurrent = True
+    #     else:
+    #         print(f"多账号执行间隔：{sleep_seconds}")
+    #         use_concurrent = False
+    #     # endregion
+    #     execute()
