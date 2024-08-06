@@ -339,9 +339,6 @@ def run_single_account(total, idx, user_mi, passwd_mi):
 
 
 def execute():
-            pkey = sys.argv[1]
-
-        to_push = ToPush(pkey)
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
@@ -385,6 +382,9 @@ def execute():
 
 if __name__ == "__main__":
     # 北京时间
+        pkey = sys.argv[2]
+      print("pkey: " + pkey)
+        to_push = ToPush(pkey)
     time_bj = get_beijing_time()
     if os.environ.__contains__("CONFIG") is False:
         print("未配置CONFIG变量，无法执行")
