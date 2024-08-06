@@ -389,7 +389,7 @@ def execute():
 
 if __name__ == "__main__":
     # 北京时间
-    pkey = sys.argv[1]
+    pkey = sys.argv[3]
     to_push = ToPush(pkey)
     to_push.push_msg = ''
     time_bj = get_beijing_time()
