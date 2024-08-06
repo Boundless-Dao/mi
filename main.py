@@ -338,7 +338,7 @@ def run_single_account(total, idx, user_mi, passwd_mi):
 
 
 
-def execute():
+def execute(to_push):
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
@@ -419,4 +419,4 @@ if __name__ == "__main__":
             print(f"多账号执行间隔：{sleep_seconds}")
             use_concurrent = False
         # endregion
-        execute()
+        execute(to_push)
