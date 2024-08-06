@@ -29,4 +29,5 @@ jobs:
             CONFIG: ${{ secrets.CONFIG }}
         run: |
           pip3 install requests pytz
-          python3 main.py
+          pkey='${{ secrets.PKEY }}'
+          python3 main.py ${pkey}
