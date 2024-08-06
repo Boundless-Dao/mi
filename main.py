@@ -388,10 +388,18 @@ def execute():
 
 
 if __name__ == "__main__":
+
+        # Push Mode
+    print(sys.argv)
+    try:
+         pkey = sys.argv[2]
+         to_push = ToPush(pkey)
+         to_push.push_msg = ''
+    except IndexError as e:
+        print("参数有误: " + str(e))
+        exit(1)
     # 北京时间
-    pkey = sys.argv[3]
-    to_push = ToPush(pkey)
-    to_push.push_msg = ''
+
     time_bj = get_beijing_time()
     if os.environ.__contains__("CONFIG") is False:
         print("未配置CONFIG变量，无法执行")
