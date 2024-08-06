@@ -382,11 +382,11 @@ def execute(to_push, users, passwords, sleep_seconds, use_concurrent):
     else:
         print(f"账号数长度 [{len(user_list)}] 和密码数长度 [{len(passwd_list)}] 不匹配，跳过执行")
         exit(1)
-        
+
 
 if __name__ == "__main__":
     # 获取命令行参数中的 pkey
-    pkey = sys.argv[2]
+    pkey = sys.argv[1]
     print("pkey: " + pkey)
 
     # 初始化 ToPush 对象
