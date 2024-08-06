@@ -191,7 +191,8 @@ class MiMotionRunner:
             "redirect_uri": "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html",
             "token": "access"
         }
-        r1 = requests.post(url1, data=data1, headers=login_headers, allow_redirects=False)
+        r1 = requests.post(
+            url1, data=data1, headers=login_headers, allow_redirects=False)
         if r1.status_code != 303:
             self.log_str += "登录异常，status: %d\n" % r1.status_code
             return 0, 0
@@ -248,7 +249,8 @@ class MiMotionRunner:
     # 获取app_token
     def get_app_token(self, login_token):
         url = f"https://account-cn.huami.com/v1/client/app_tokens?app_name=com.xiaomi.hm.health&dn=api-user.huami.com%2Capi-mifit.huami.com%2Capp-analytics.huami.com&login_token={login_token}"
-        headers = {'User-Agent': 'MiFit/5.3.0 (iPhone; iOS 14.7.1; Scale/3.00)', 'X-Forwarded-For': self.fake_ip_addr}
+        headers = {
+            'User-Agent': 'MiFit/5.3.0 (iPhone; iOS 14.7.1; Scale/3.00)', 'X-Forwarded-For': self.fake_ip_addr}
         response = requests.get(url, headers=headers).json()
         app_token = response['token_info']['app_token']
         # print("app_token获取成功！")
@@ -275,8 +277,10 @@ class MiMotionRunner:
 
         finddate = re.compile(r".*?date%22%3A%22(.*?)%22%2C%22data.*?")
         findstep = re.compile(r".*?ttl%5C%22%3A(.*?)%2C%5C%22dis.*?")
-        data_json = re.sub(finddate.findall(data_json)[0], today, str(data_json))
-        data_json = re.sub(findstep.findall(data_json)[0], step, str(data_json))
+        data_json = re.sub(finddate.findall(data_json)
+                           [0], today, str(data_json))
+        data_json = re.sub(findstep.findall(data_json)
+                           [0], step, str(data_json))
 
         url = f'https://api-mifit-cn.huami.com/v1/data/band_data.json?&t={t}'
         head = {
@@ -298,7 +302,8 @@ def push_to_push_plus(exec_results, summary):
     if PUSH_PLUS_TOKEN is not None and PUSH_PLUS_TOKEN != '' and PUSH_PLUS_TOKEN != 'NO':
         if PUSH_PLUS_HOUR is not None and PUSH_PLUS_HOUR.isdigit():
             if time_bj.hour != int(PUSH_PLUS_HOUR):
-                print(f"当前设置push_plus推送整点为：{PUSH_PLUS_HOUR}, 当前整点为：{time_bj.hour}，跳过推送")
+                print(
+                    f"当前设置push_plus推送整点为：{PUSH_PLUS_HOUR}, 当前整点为：{time_bj.hour}，跳过推送")
                 return
         html = f'<div>{summary}</div>'
         if len(exec_results) >= PUSH_PLUS_MAX:
@@ -336,10 +341,8 @@ def run_single_account(total, idx, user_mi, passwd_mi):
     return exec_result
 
 
-
-
 def execute(to_push):
-    to_push=to_push
+    to_push = to_push
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
@@ -348,10 +351,12 @@ def execute(to_push):
         if use_concurrent:
             import concurrent.futures
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                exec_results = executor.map(lambda x: run_single_account(total, x[0], *x[1]), enumerate(zip(user_list, passwd_list)))
+                exec_results = executor.map(lambda x: run_single_account(
+                    total, x[0], *x[1]), enumerate(zip(user_list, passwd_list)))
         else:
             for user_mi, passwd_mi in zip(user_list, passwd_list):
-                exec_results.append(run_single_account(total, idx, user_mi, passwd_mi))
+                exec_results.append(run_single_account(
+                    total, idx, user_mi, passwd_mi))
                 idx += 1
                 if idx < total:
                     # 每个账号之间间隔一定时间请求一次，避免接口请求过于频繁导致异常
@@ -364,7 +369,7 @@ def execute(to_push):
             if result['success'] is True:
                 success_count += 1
         summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
-            # summary = f"\n执行账号总数，"
+        # summary = f"\n执行账号总数，"
         print(summary)
 
         to_push.push_msg += summary
@@ -385,10 +390,9 @@ def execute(to_push):
 
 if __name__ == "__main__":
     # 北京时间
-        pkey = sys.argv[1]
-      print("pkey: " + pkey)
-        to_push = ToPush(pkey)
-           to_push.push_msg = ''
+    pkey = sys.argv[1]
+    to_push = ToPush(pkey)
+    to_push.push_msg = ''
     time_bj = get_beijing_time()
     if os.environ.__contains__("CONFIG") is False:
         print("未配置CONFIG变量，无法执行")
