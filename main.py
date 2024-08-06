@@ -363,13 +363,13 @@ def execute(to_push):
             push_results.append(result)
             if result['success'] is True:
                 success_count += 1
-        # summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
-            summary = f"\n执行账号总数，"
+        summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
+            # summary = f"\n执行账号总数，"
         print(summary)
 
-               to_push.push_msg += summary
+        to_push.push_msg += summary
         # push_to_push_plus(push_results, summary)
-                push = {
+        push = {
             'wx': to_push.to_push_wx,
             'nwx': to_push.to_push_server,
             'tg': to_push.to_push_tg,
@@ -377,7 +377,7 @@ def execute(to_push):
             'pp': to_push.to_push_pushplus,
             'off': to_push.no_push
         }
-            push['tg']()
+        push['tg']()
     else:
         print(f"账号数长度[{len(user_list)}]和密码数长度[{len(passwd_list)}]不匹配，跳过执行")
         exit(1)
