@@ -57,6 +57,72 @@ def get_time():
     return "%.0f" % (current_time.timestamp() * 1000)
 
 
+class ToPush:
+    """
+    推送接口类
+    处理pkey并转发推送消息到推送函数
+    """
+    push_msg: str
+
+    def __init__(self, _pkey):
+        self.pkey = _pkey
+
+    def to_push_wx(self):
+        """
+        推送server酱接口
+        """
+        if str(self.pkey) == '0':
+            self.pkey = ''
+        push_wx(self.pkey, self.push_msg)
+
+    def to_push_server(self):
+        """
+        推送消息到微信接口
+        """
+        if str(self.pkey) == '0':
+            self.pkey = ''
+        push_server(self.pkey, self.push_msg)
+
+    def to_push_tg(self):
+        """
+        推送消息到TG接口
+        """
+        try:
+            token, chat_id = self.pkey.split('@')
+            push_tg(token, chat_id, self.push_msg)
+        except ValueError:
+            print('tg推送参数有误！')
+
+    def to_wxpush(self):
+        """
+        企业微信推送接口
+        """
+        try:
+            usr, corpid, corpsecret, *agentid = self.pkey.split('-')
+            if agentid:
+                wxpush(self.push_msg, usr, corpid, corpsecret, int(agentid[0]))
+            else:
+                wxpush(self.push_msg, usr, corpid, corpsecret)
+        except ValueError:
+            print('企业微信推送参数有误！')
+
+    def to_push_pushplus(self):
+        """
+        接口
+        """
+        if self.pkey == '':
+            print('pushplus token错误')
+        else:
+            push_pushplus(self.pkey, self.push_msg)
+
+    @staticmethod
+    def no_push():
+        """
+        不推送
+        """
+        print('不推送')
+
+
 # 获取登录code
 def get_access_token(location):
     code_pattern = re.compile("(?<=access=).*?(?=&)")
@@ -270,7 +336,12 @@ def run_single_account(total, idx, user_mi, passwd_mi):
     return exec_result
 
 
+
+
 def execute():
+            pkey = sys.argv[1]
+
+        to_push = ToPush(pkey)
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
@@ -296,7 +367,17 @@ def execute():
                 success_count += 1
         summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
         print(summary)
-        push_to_push_plus(push_results, summary)
+               to_push.push_msg = summary
+        # push_to_push_plus(push_results, summary)
+                push = {
+            'wx': to_push.to_push_wx,
+            'nwx': to_push.to_push_server,
+            'tg': to_push.to_push_tg,
+            'qwx': to_push.to_wxpush,
+            'pp': to_push.to_push_pushplus,
+            'off': to_push.no_push
+        }
+            push['tg']()
     else:
         print(f"账号数长度[{len(user_list)}]和密码数长度[{len(passwd_list)}]不匹配，跳过执行")
         exit(1)
