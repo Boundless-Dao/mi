@@ -8,13 +8,17 @@ import json
 import random
 import re
 import time
-import os
 import sys
+import os
 
 import requests
 
 
+now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
 # 获取北京时间
+
+
 def get_beijing_time():
     target_timezone = pytz.timezone('Asia/Shanghai')
     # 获取当前时间
@@ -38,6 +42,31 @@ def get_min_max_by_time():
     return int(21000), int(25000)
 
 
+def push_tg(token, chat_id, desp=""):
+    """
+    推送消息到TG
+    """
+    if token == '':
+        print("[注意] 未提供token，不进行tg推送！")
+    elif chat_id == '':
+        print("[注意] 未提供chat_id，不进行tg推送！")
+    else:
+        server_url = f"https://api.telegram.org/bot{token}/sendmessage"
+        params = {
+            "text": '小米运动 步数修改\n\n' + desp,
+            "chat_id": chat_id
+        }
+
+        response = requests.get(server_url, params=params)
+        json_data = response.json()
+
+        if json_data['ok']:
+            print(f"[{now}] 推送成功。")
+        else:
+            print(
+                f"[{now}] 推送失败：{json_data['error_code']}({json_data['description']})")
+
+
 # 虚拟ip地址
 def fake_ip():
     # 随便找的国内IP段：223.64.0.0 - 223.117.255.255
@@ -52,12 +81,6 @@ def desensitize_user_name(user):
     return f'{user[:3]}****{user[-4:]}'
 
 
-# 获取时间戳
-def get_time():
-    current_time = get_beijing_time()
-    return "%.0f" % (current_time.timestamp() * 1000)
-
-
 class ToPush:
     """
     推送接口类
@@ -67,22 +90,12 @@ class ToPush:
 
     def __init__(self, _pkey):
         self.pkey = _pkey
-
-    def to_push_wx(self):
-        """
-        推送server酱接口
-        """
-        if str(self.pkey) == '0':
-            self.pkey = ''
-        push_wx(self.pkey, self.push_msg)
-
-    def to_push_server(self):
         """
         推送消息到微信接口
         """
         if str(self.pkey) == '0':
             self.pkey = ''
-        push_server(self.pkey, self.push_msg)
+        # push_server(self.pkey, self.push_msg)
 
     def to_push_tg(self):
         """
@@ -94,34 +107,18 @@ class ToPush:
         except ValueError:
             print('tg推送参数有误！')
 
-    def to_wxpush(self):
-        """
-        企业微信推送接口
-        """
-        try:
-            usr, corpid, corpsecret, *agentid = self.pkey.split('-')
-            if agentid:
-                wxpush(self.push_msg, usr, corpid, corpsecret, int(agentid[0]))
-            else:
-                wxpush(self.push_msg, usr, corpid, corpsecret)
-        except ValueError:
-            print('企业微信推送参数有误！')
-
-    def to_push_pushplus(self):
-        """
-        接口
-        """
-        if self.pkey == '':
-            print('pushplus token错误')
-        else:
-            push_pushplus(self.pkey, self.push_msg)
-
     @staticmethod
     def no_push():
         """
         不推送
         """
         print('不推送')
+
+
+# 获取时间戳
+def get_time():
+    current_time = get_beijing_time()
+    return "%.0f" % (current_time.timestamp() * 1000)
 
 
 # 获取登录code
@@ -370,15 +367,10 @@ def execute():
                 success_count += 1
         summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
         print(summary)
-
         to_push.push_msg += summary
         # push_to_push_plus(push_results, summary)
         push = {
-            'wx': to_push.to_push_wx,
-            'nwx': to_push.to_push_server,
             'tg': to_push.to_push_tg,
-            'qwx': to_push.to_wxpush,
-            'pp': to_push.to_push_pushplus,
             'off': to_push.no_push
         }
         push['tg']()
@@ -388,18 +380,11 @@ def execute():
 
 
 if __name__ == "__main__":
-
-        # Push Mode
-    print(sys.argv)
-    try:
-         pkey = sys.argv[2]
-         to_push = ToPush(pkey)
-         to_push.push_msg = ''
-    except IndexError as e:
-        print("参数有误: " + str(e))
-        exit(1)
     # 北京时间
+    pkey = sys.argv[2]
 
+    to_push = ToPush(pkey)
+    to_push.push_msg = ''
     time_bj = get_beijing_time()
     if os.environ.__contains__("CONFIG") is False:
         print("未配置CONFIG变量，无法执行")
