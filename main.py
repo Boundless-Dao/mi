@@ -338,17 +338,17 @@ def run_single_account(total, idx, user_mi, passwd_mi):
 
 
 
-def execute(to_push, users, passwords, sleep_seconds, use_concurrent):
+def execute(to_push):
+    to_push=to_push
     user_list = users.split('#')
     passwd_list = passwords.split('#')
     exec_results = []
-
     if len(user_list) == len(passwd_list):
         idx, total = 0, len(user_list)
         if use_concurrent:
             import concurrent.futures
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                exec_results = list(executor.map(lambda x: run_single_account(total, x[0], *x[1]), enumerate(zip(user_list, passwd_list))))
+                exec_results = executor.map(lambda x: run_single_account(total, x[0], *x[1]), enumerate(zip(user_list, passwd_list)))
         else:
             for user_mi, passwd_mi in zip(user_list, passwd_list):
                 exec_results.append(run_single_account(total, idx, user_mi, passwd_mi))
@@ -361,15 +361,15 @@ def execute(to_push, users, passwords, sleep_seconds, use_concurrent):
         push_results = []
         for result in exec_results:
             push_results.append(result)
-            if result['success']:
+            if result['success'] is True:
                 success_count += 1
-
-        summary = f"\n执行账号总数 {total}，成功：{success_count}，失败：{total - success_count}"
+        # summary = f"\n执行账号总数{total}，成功：{success_count}，失败：{total - success_count}"
+            summary = f"\n执行账号总数，"
         print(summary)
 
-        to_push.push_msg += summary
-
-        push = {
+               to_push.push_msg += summary
+        # push_to_push_plus(push_results, summary)
+                push = {
             'wx': to_push.to_push_wx,
             'nwx': to_push.to_push_server,
             'tg': to_push.to_push_tg,
@@ -377,58 +377,49 @@ def execute(to_push, users, passwords, sleep_seconds, use_concurrent):
             'pp': to_push.to_push_pushplus,
             'off': to_push.no_push
         }
-        if 'tg' in push:
             push['tg']()
     else:
-        print(f"账号数长度 [{len(user_list)}] 和密码数长度 [{len(passwd_list)}] 不匹配，跳过执行")
+        print(f"账号数长度[{len(user_list)}]和密码数长度[{len(passwd_list)}]不匹配，跳过执行")
         exit(1)
 
 
 if __name__ == "__main__":
-    # 获取命令行参数中的 pkey
-    pkey = sys.argv[1]
-    print("pkey: " + pkey)
-
-    # 初始化 ToPush 对象
-    to_push = ToPush(pkey)
-    to_push.push_msg = ''
-
-    # 获取北京时间
+    # 北京时间
+        pkey = sys.argv[1]
+      print("pkey: " + pkey)
+        to_push = ToPush(pkey)
+           to_push.push_msg = ''
     time_bj = get_beijing_time()
-
-    # 检查是否配置了 CONFIG 环境变量
-    if "CONFIG" not in os.environ:
-        print("未配置 CONFIG 变量，无法执行")
+    if os.environ.__contains__("CONFIG") is False:
+        print("未配置CONFIG变量，无法执行")
         exit(1)
     else:
-        # 初始化参数
+        # region 初始化参数
         config = dict()
         try:
             config = dict(json.loads(os.environ.get("CONFIG")))
-        except Exception as e:
-            print("CONFIG 格式不正确，请检查 Secret 配置，请严格按照 JSON 格式：使用双引号包裹字段和值，逗号不能多也不能少")
+        except:
+            print("CONFIG格式不正确，请检查Secret配置，请严格按照JSON格式：使用双引号包裹字段和值，逗号不能多也不能少")
             traceback.print_exc()
             exit(1)
-
         PUSH_PLUS_TOKEN = config.get('PUSH_PLUS_TOKEN')
         PUSH_PLUS_HOUR = config.get('PUSH_PLUS_HOUR')
         PUSH_PLUS_MAX = get_int_value_default(config, 'PUSH_PLUS_MAX', 30)
-        sleep_seconds = config.get('SLEEP_GAP', 5)
+        sleep_seconds = config.get('SLEEP_GAP')
+        if sleep_seconds is None or sleep_seconds == '':
+            sleep_seconds = 5
         sleep_seconds = float(sleep_seconds)
         users = config.get('USER')
         passwords = config.get('PWD')
-
         if users is None or passwords is None:
             print("未正确配置账号密码，无法执行")
             exit(1)
-
         min_step, max_step = get_min_max_by_time()
-
         use_concurrent = config.get('USE_CONCURRENT')
-        if use_concurrent is not None and use_concurrent.lower() == 'true':
+        if use_concurrent is not None and use_concurrent == 'True':
             use_concurrent = True
         else:
             print(f"多账号执行间隔：{sleep_seconds}")
             use_concurrent = False
-
-        execute(to_push, users, passwords, sleep_seconds, use_concurrent)
+        # endregion
+        execute(to_push)
